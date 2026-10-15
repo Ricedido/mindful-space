@@ -10,7 +10,7 @@
   <style>
     :root {
       --bg-cream: #FAF8F5;
-      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-bg: rgba(255, 255, 255, 0.88);
       --card-subtle: #F3EFEA;
       --text-main: #2C2C2A;
       --text-muted: #7E7C77;
@@ -53,7 +53,7 @@
       max-width: 580px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 22px;
     }
 
     /* Header */
@@ -88,8 +88,8 @@
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       color: var(--text-muted);
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -105,7 +105,7 @@
       transform: translateY(-1px);
     }
 
-    /* Tabs */
+    /* Navigation Tabs */
     .nav-tabs {
       display: flex;
       background: rgba(232, 226, 217, 0.45);
@@ -135,7 +135,7 @@
       font-weight: 600;
     }
 
-    /* Card Panels */
+    /* Cards */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -249,10 +249,10 @@
     .config-section {
       width: 100%;
       border-top: 1px dashed var(--border-color);
-      padding-top: 18px;
+      padding-top: 20px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 18px;
     }
 
     .config-row {
@@ -346,8 +346,8 @@
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-bottom: 20px;
+      gap: 10px;
+      margin-bottom: 22px;
     }
 
     .form-group label {
@@ -397,14 +397,59 @@
       border-color: var(--accent-sage);
     }
 
+    /* Stats Dashboard: 累積靜心總長 & 連續靜心 */
+    .stats-dashboard {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 22px 20px;
+      margin-bottom: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(12px);
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .stat-label {
+      font-size: 14.5px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .stat-num-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .stat-num {
+      font-size: 34px;
+      font-family: var(--font-serif);
+      color: var(--accent-sage);
+      font-weight: 600;
+    }
+
+    .stat-unit {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
     /* History & Idea Vault */
     .entry-card {
       background: #FFFFFF;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
-      padding: 16px;
+      padding: 18px;
       margin-bottom: 14px;
       position: relative;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.02);
     }
 
     .entry-date {
@@ -419,27 +464,27 @@
       font-family: var(--font-serif);
       font-weight: 600;
       color: var(--accent-sage);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .entry-tags {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 7px;
       margin: 8px 0;
     }
 
     .entry-tag {
-      font-size: 13px;
+      font-size: 13.5px;
       background: var(--card-subtle);
       color: var(--text-muted);
-      padding: 3px 8px;
-      border-radius: 4px;
+      padding: 4px 10px;
+      border-radius: 6px;
     }
 
     .entry-idea {
-      margin-top: 10px;
-      padding: 10px;
+      margin-top: 12px;
+      padding: 12px;
       background: #FFFDF9;
       border-left: 3px solid var(--accent-clay);
       font-size: 15.5px;
@@ -457,6 +502,7 @@
       color: var(--text-light);
       cursor: pointer;
       font-size: 16px;
+      padding: 4px;
     }
 
     .del-btn:hover {
@@ -504,7 +550,7 @@
 
     .empty-tip {
       text-align: center;
-      padding: 36px 0;
+      padding: 38px 0;
       color: var(--text-light);
       font-size: 16px;
       font-family: var(--font-serif);
@@ -513,6 +559,9 @@
   </style>
 </head>
 <body>
+
+  <!-- Background Audio Keep-Alive (Enables background Web Audio playback on iOS/Android lock screen) -->
+  <audio id="silent-audio-keepalive" loop playsinline preload="auto" src="data:audio/wav;base64,UklGRmQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="></audio>
 
   <div class="app-container">
     <!-- Header -->
@@ -524,14 +573,14 @@
       <div class="header-actions">
         <!-- Quick Idea Modal Trigger -->
         <button class="icon-btn" id="btn-quick-idea" title="速記靈感">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 18h6"/><path d="M10 22h4"/>
             <path d="M12 2a7 7 0 0 0-7 7c0 2.5 1.5 4.5 3 6h8c1.5-1.5 3-3.5 3-6a7 7 0 0 0-7-7z"/>
           </svg>
         </button>
         <!-- Bell / Sound Test -->
-        <button class="icon-btn" id="btn-bell-test" title="敲響頌缽">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button class="icon-btn" id="btn-bell-test" title="敲響提示音">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
             <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
           </svg>
@@ -553,7 +602,7 @@
         <div class="breathe-wrapper">
           <div class="breathe-ring" id="breathe-ring"></div>
           <div class="timer-display">
-            <div class="timer-stage" id="timer-stage-title">準備靜心</div>
+            <div class="timer-stage" id="timer-stage-title">準備：靜心-與己同在</div>
             <div class="timer-digits" id="timer-digits">15:00</div>
           </div>
         </div>
@@ -565,7 +614,7 @@
 
         <!-- Configuration -->
         <div class="config-section" id="timer-config-panel">
-          <!-- Static Meditation Duration (Min 15 min) -->
+          <!-- Static Meditation Duration -->
           <div class="config-row">
             <div class="config-label">
               <span>靜心時長</span>
@@ -599,8 +648,6 @@
             </div>
           </div>
 
-          <!-- Daily Reminder Toggle -->
-          <div class="config-row">
           <!-- Sound Selection & Volume -->
           <div class="config-row">
             <div class="config-label">
@@ -623,15 +670,6 @@
               <span style="font-size: 13px; color: var(--text-muted);">柔</span>
               <input type="range" id="sound-volume-slider" min="0" max="1" step="0.05" value="0.7" style="flex: 1; accent-color: var(--accent-sage); cursor: pointer;">
               <span style="font-size: 13px; color: var(--text-muted);">朗</span>
-            </div>
-          </div>
-
-            <div class="toggle-row">
-              <div>
-                <div style="font-size: 15.5px; color: var(--text-main);">每日靜心提醒</div>
-                <div style="font-size: 15px; color: var(--text-muted);">固定於設定時間推播溫和提醒</div>
-              </div>
-              <input type="time" id="reminder-time" value="21:30" style="padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit;">
             </div>
           </div>
         </div>
@@ -671,7 +709,7 @@
           </div>
         </div>
 
-        <!-- Mind Status -->
+        <!-- Mind Status with Custom Input -->
         <div class="form-group">
           <label>靜心狀態（心智流轉）</label>
           <div class="tag-grid" id="mind-tags">
@@ -682,9 +720,10 @@
             <span class="tag-choice">些許昏沉</span>
             <span class="tag-choice">時間感消融</span>
           </div>
+          <input type="text" id="custom-mind-status" placeholder="自由填寫感受或心境描寫（選填，可直接輸入）...">
         </div>
 
-        <!-- Body Awareness -->
+        <!-- Body Awareness with Custom Input -->
         <div class="form-group">
           <label>身體覺察（痠、痛、麻、通透）</label>
           <div class="tag-grid" id="body-tags">
@@ -696,6 +735,7 @@
             <span class="tag-choice">胸口微悶已開</span>
             <span class="tag-choice">溫熱氣感</span>
           </div>
+          <input type="text" id="custom-body-status" placeholder="自由填寫身體覺知，如：右膝微脹、後腰微溫（選填）...">
         </div>
 
         <!-- Inspiration / Idea -->
@@ -710,20 +750,26 @@
 
     <!-- TAB 3: History -->
     <div id="view-history" class="tab-content" style="display: none;">
-      <!-- 連續靜心 累積卡片 -->
-      <div class="card" style="margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; padding: 18px 22px;">
-        <div>
-          <div style="font-size: 14.5px; color: var(--text-muted); letter-spacing: 1px;">實修積累</div>
-          <div style="font-size: 17px; font-weight: 500; color: var(--text-main); margin-top: 2px;">連續靜心</div>
+      <!-- 實修雙數據看板：連續靜心 & 累積靜心總長 -->
+      <div class="stats-dashboard">
+        <div class="stat-box">
+          <div class="stat-label">連續靜心</div>
+          <div class="stat-num-row">
+            <span id="streak-days-count" class="stat-num">0</span>
+            <span class="stat-unit">天</span>
+          </div>
         </div>
-        <div style="display: flex; align-items: baseline; gap: 4px;">
-          <span id="streak-days-count" style="font-size: 38px; font-family: var(--font-serif); color: var(--accent-sage); font-weight: 600;">0</span>
-          <span style="font-size: 15px; color: var(--text-muted);">天</span>
+        <div class="stat-box" style="border-left: 1px dashed var(--border-color); padding-left: 16px;">
+          <div class="stat-label">累積靜心總長</div>
+          <div class="stat-num-row">
+            <span id="total-meditation-time" class="stat-num" style="font-size: 26px;">0 分鐘</span>
+          </div>
         </div>
       </div>
+
       <div id="history-list"></div>
 
-      <!-- 資料備份與匯入 -->
+      <!-- 資料安全與備份區塊 -->
       <div class="card" style="margin-top: 24px; padding: 20px; background: rgba(255, 255, 255, 0.7);">
         <div style="font-size: 15px; font-weight: 500; color: var(--text-main); margin-bottom: 4px;">資料安全與備份</div>
         <div style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">紀錄皆保存在此裝置瀏覽器中。換機或清理快取前，建議匯出備份檔。</div>
@@ -747,7 +793,6 @@
           <input type="file" id="file-import-input" accept=".json" style="display: none;">
         </div>
       </div>
-
     </div>
 
     <!-- TAB 4: Ideas Vault -->
@@ -766,18 +811,20 @@
       <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">將浮現的靈感放下，繼續回到呼吸。</p>
       <textarea id="quick-idea-text" rows="4" placeholder="寫下剛剛冒出來的念頭或靈感..."></textarea>
       <div style="display:flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
-        <button class="btn-secondary" id="btn-cancel-quick-idea" style="padding: 8px 18px; font-size: 13px;">取消</button>
-        <button class="btn-main" id="btn-save-quick-idea" style="padding: 8px 20px; font-size: 13px;">留存靈光</button>
+        <button class="btn-secondary" id="btn-cancel-quick-idea" style="padding: 8px 18px; font-size: 14px;">取消</button>
+        <button class="btn-main" id="btn-save-quick-idea" style="padding: 8px 20px; font-size: 14px;">留存靈光</button>
       </div>
     </div>
   </div>
 
   <script>
-        // --- Advanced Audio Synthesis (Web Audio API) ---
+    // --- Audio Synthesis Engine (Web Audio API with Precise Timeline Scheduling) ---
     const AudioEngine = {
       ctx: null,
       soundType: 'bowl', // 'bowl', 'chime', 'zen'
       volume: 0.7,
+      scheduledGains: [], // to track and cancel if user stops/resets
+
       init() {
         if (!this.ctx) {
           const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -793,26 +840,48 @@
       setSoundType(type) {
         this.soundType = type;
       },
-      playSound() {
+      cancelScheduled() {
+        this.scheduledGains.forEach(g => {
+          try {
+            g.gain.cancelScheduledValues(this.ctx.currentTime);
+            g.gain.setValueAtTime(0, this.ctx.currentTime);
+          } catch(e) {}
+        });
+        this.scheduledGains = [];
+      },
+      // Plays a single strike at a specific target time on ctx timeline
+      playSound(targetTime = null) {
         this.init();
         if (this.volume <= 0.001) return;
+        const time = targetTime !== null ? targetTime : this.ctx.currentTime;
 
         if (this.soundType === 'chime') {
-          this.playCrystalChime();
+          this.playCrystalChime(time);
         } else if (this.soundType === 'zen') {
-          this.playSoftZen();
+          this.playSoftZen(time);
         } else {
-          this.playTibetanBowl();
+          this.playTibetanBowl(time);
         }
       },
-      // 1. 沉穩藏缽 (Tibetan Singing Bowl)
-      playTibetanBowl() {
-        const now = this.ctx.currentTime;
-        const masterGain = this.ctx.createGain();
-        masterGain.gain.setValueAtTime(this.volume, now);
-        masterGain.connect(this.ctx.destination);
+      // 靜心結束專屬提示音：三聲圓滿頌罄（間隔 1.8 秒，悠遠綿長）
+      playClosingSound(targetTime = null) {
+        this.init();
+        if (this.volume <= 0.001) return;
+        const baseTime = targetTime !== null ? targetTime : this.ctx.currentTime;
 
-        const baseFreq = 216; // 悠遠沉穩低音
+        // 敲響三聲，餘音層層疊加
+        this.playSound(baseTime);
+        this.playSound(baseTime + 1.8);
+        this.playSound(baseTime + 3.6);
+      },
+      // 1. 沉穩藏缽 (Tibetan Singing Bowl)
+      playTibetanBowl(time) {
+        const masterGain = this.ctx.createGain();
+        masterGain.gain.setValueAtTime(this.volume, time);
+        masterGain.connect(this.ctx.destination);
+        this.scheduledGains.push(masterGain);
+
+        const baseFreq = 216;
         const harmonics = [1, 2.76, 5.4, 8.9];
         const gains = [0.65, 0.28, 0.12, 0.05];
 
@@ -821,26 +890,26 @@
           const gain = this.ctx.createGain();
 
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(baseFreq * harmonic, now);
+          osc.frequency.setValueAtTime(baseFreq * harmonic, time);
 
-          gain.gain.setValueAtTime(gains[idx], now);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 4.8);
+          gain.gain.setValueAtTime(0.0001, time);
+          gain.gain.linearRampToValueAtTime(gains[idx], time + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.0001, time + 4.8);
 
           osc.connect(gain);
           gain.connect(masterGain);
 
-          osc.start(now);
-          osc.stop(now + 4.9);
+          osc.start(time);
+          osc.stop(time + 4.9);
         });
       },
       // 2. 空靈引罄 (Pure Crystal Chime / Singing Bell)
-      playCrystalChime() {
-        const now = this.ctx.currentTime;
+      playCrystalChime(time) {
         const masterGain = this.ctx.createGain();
-        masterGain.gain.setValueAtTime(this.volume, now);
+        masterGain.gain.setValueAtTime(this.volume, time);
         masterGain.connect(this.ctx.destination);
+        this.scheduledGains.push(masterGain);
 
-        // 高雅空靈清脆引罄 (1046Hz ~ C6, 搭配金屬泛音)
         const partials = [
           { freq: 1046.5, gain: 0.55, decay: 3.8 },
           { freq: 2093.0, gain: 0.25, decay: 2.6 },
@@ -853,24 +922,25 @@
           const gain = this.ctx.createGain();
 
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(p.freq, now);
+          osc.frequency.setValueAtTime(p.freq, time);
 
-          gain.gain.setValueAtTime(p.gain, now);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + p.decay);
+          gain.gain.setValueAtTime(0.0001, time);
+          gain.gain.linearRampToValueAtTime(p.gain, time + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, time + p.decay);
 
           osc.connect(gain);
           gain.connect(masterGain);
 
-          osc.start(now);
-          osc.stop(now + p.decay + 0.1);
+          osc.start(time);
+          osc.stop(time + p.decay + 0.1);
         });
       },
       // 3. 柔和禪磬 (Soft Zen Bell - 432Hz 溫潤內斂)
-      playSoftZen() {
-        const now = this.ctx.currentTime;
+      playSoftZen(time) {
         const masterGain = this.ctx.createGain();
-        masterGain.gain.setValueAtTime(this.volume, now);
+        masterGain.gain.setValueAtTime(this.volume, time);
         masterGain.connect(this.ctx.destination);
+        this.scheduledGains.push(masterGain);
 
         const partials = [
           { freq: 432.0, gain: 0.6, decay: 3.2 },
@@ -883,22 +953,52 @@
           const gain = this.ctx.createGain();
 
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(p.freq, now);
+          osc.frequency.setValueAtTime(p.freq, time);
 
-          gain.gain.setValueAtTime(p.gain, now);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + p.decay);
+          gain.gain.setValueAtTime(0.0001, time);
+          gain.gain.linearRampToValueAtTime(p.gain, time + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.0001, time + p.decay);
 
           osc.connect(gain);
           gain.connect(masterGain);
 
-          osc.start(now);
-          osc.stop(now + p.decay + 0.1);
+          osc.start(time);
+          osc.stop(time + p.decay + 0.1);
         });
-      },
-      playBowl() {
-        this.playSound();
       }
     };
+
+    // --- Screen WakeLock & Background Keep-Alive Helper ---
+    let wakeLockSentinel = null;
+    const silentAudio = document.getElementById('silent-audio-keepalive');
+
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLockSentinel = await navigator.wakeLock.request('screen');
+        }
+      } catch (err) {}
+    }
+
+    function releaseWakeLock() {
+      if (wakeLockSentinel) {
+        wakeLockSentinel.release().catch(() => {});
+        wakeLockSentinel = null;
+      }
+    }
+
+    function startBackgroundAudioSession() {
+      if (silentAudio) {
+        silentAudio.play().catch(() => {});
+      }
+    }
+
+    function stopBackgroundAudioSession() {
+      if (silentAudio) {
+        silentAudio.pause();
+        silentAudio.currentTime = 0;
+      }
+    }
 
     // --- State Management & Storage ---
     const DB_KEY = 'mindful_space_data_v1';
@@ -911,7 +1011,7 @@
       localStorage.setItem(DB_KEY, JSON.stringify(appData));
     }
 
-    // --- App Flow & Tab Switching ---
+    // --- Tabs Switching ---
     const tabs = document.querySelectorAll('.tab-btn');
     const tabContents = {
       timer: document.getElementById('view-timer'),
@@ -935,14 +1035,15 @@
       });
     });
 
-    // --- Timer System ---
+    // --- Precision Timer System (Wall-clock based) ---
     let timerState = {
       hasDynamic: false,
       dynamicMins: 5,
-      staticMins: 15, // Default minimum 15 mins
+      staticMins: 15,
       currentStage: 'idle', // 'dynamic', 'static', 'completed'
       secondsLeft: 15 * 60,
-      totalSeconds: 15 * 60,
+      stageEndTime: null,   // wall clock epoch timestamp (ms)
+      stageTargetAudioTime: null, // Web Audio ctx timestamp
       intervalId: null
     };
 
@@ -963,7 +1064,6 @@
       digitsEl.textContent = formatTime(timerState.secondsLeft);
     }
 
-    // Chip selectors
     document.querySelectorAll('#static-chip-group .chip').forEach(btn => {
       btn.addEventListener('click', () => {
         if (timerState.currentStage !== 'idle') return;
@@ -1006,9 +1106,34 @@
       });
     });
 
-    // Timer Run Logic
+    // Setup stage timing and schedule audio cues ahead of time
+    function setupStage(stageName, durationSeconds, isInitial = false) {
+      timerState.currentStage = stageName;
+      timerState.secondsLeft = durationSeconds;
+      timerState.stageEndTime = Date.now() + durationSeconds * 1000;
+
+      const nowAudio = AudioEngine.ctx.currentTime;
+      timerState.stageTargetAudioTime = nowAudio + durationSeconds;
+
+      if (stageName === 'dynamic') {
+        stageTitleEl.textContent = '動態靜心（鬆身甩手）';
+        if (isInitial) AudioEngine.playSound(); // 起始音
+        // 預約動態結束過渡音
+        AudioEngine.playSound(timerState.stageTargetAudioTime);
+      } else if (stageName === 'static') {
+        stageTitleEl.textContent = '靜心-與己同在';
+        if (isInitial) AudioEngine.playSound(); // 起始音
+        // 預約「靜心結束專屬提示音」（圓滿三聲）
+        AudioEngine.playClosingSound(timerState.stageTargetAudioTime);
+      }
+      updateTimerDisplay();
+    }
+
     function startTimer() {
-      AudioEngine.playBowl();
+      AudioEngine.init();
+      requestWakeLock();
+      startBackgroundAudioSession();
+
       breatheRing.classList.add('active');
       configPanel.style.opacity = '0.4';
       configPanel.style.pointerEvents = 'none';
@@ -1017,44 +1142,64 @@
 
       if (timerState.currentStage === 'idle') {
         if (timerState.hasDynamic) {
-          timerState.currentStage = 'dynamic';
-          stageTitleEl.textContent = '動態靜心（鬆身甩手）';
-          timerState.secondsLeft = timerState.dynamicMins * 60;
+          setupStage('dynamic', timerState.dynamicMins * 60, true);
         } else {
-          timerState.currentStage = 'static';
-          stageTitleEl.textContent = '靜心-與己同在';
-          timerState.secondsLeft = timerState.staticMins * 60;
+          setupStage('static', timerState.staticMins * 60, true);
+        }
+      } else {
+        // Resuming from pause
+        timerState.stageEndTime = Date.now() + timerState.secondsLeft * 1000;
+        const nowAudio = AudioEngine.ctx.currentTime;
+        timerState.stageTargetAudioTime = nowAudio + timerState.secondsLeft;
+
+        if (timerState.currentStage === 'dynamic') {
+          AudioEngine.playSound(timerState.stageTargetAudioTime);
+        } else if (timerState.currentStage === 'static') {
+          AudioEngine.playClosingSound(timerState.stageTargetAudioTime);
         }
       }
 
-      timerState.intervalId = setInterval(() => {
-        if (timerState.secondsLeft > 0) {
-          timerState.secondsLeft--;
-          updateTimerDisplay();
-        } else {
-          // Stage Transition or Complete
-          if (timerState.currentStage === 'dynamic') {
-            AudioEngine.playBowl();
-            timerState.currentStage = 'static';
-            stageTitleEl.textContent = '靜心-與己同在';
-            timerState.secondsLeft = timerState.staticMins * 60;
-            updateTimerDisplay();
-          } else {
-            // Finished
-            clearInterval(timerState.intervalId);
-            AudioEngine.playBowl();
-            breatheRing.classList.remove('active');
-            stageTitleEl.textContent = '靜心圓滿';
-            toggleBtn.textContent = '完成並紀錄';
-            timerState.currentStage = 'completed';
-          }
-        }
-      }, 1000);
+      // Interval for live display updates
+      timerState.intervalId = setInterval(tick, 1000);
+    }
+
+    function tick() {
+      if (!timerState.stageEndTime) return;
+      const now = Date.now();
+      const remaining = Math.max(0, Math.round((timerState.stageEndTime - now) / 1000));
+      timerState.secondsLeft = remaining;
+      updateTimerDisplay();
+
+      if (remaining <= 0) {
+        handleStageCompletion();
+      }
+    }
+
+    function handleStageCompletion() {
+      if (timerState.currentStage === 'dynamic') {
+        // Transition to static stage
+        setupStage('static', timerState.staticMins * 60, false);
+      } else if (timerState.currentStage === 'static') {
+        // Meditation Complete!
+        clearInterval(timerState.intervalId);
+        timerState.intervalId = null;
+        releaseWakeLock();
+        stopBackgroundAudioSession();
+
+        breatheRing.classList.remove('active');
+        stageTitleEl.textContent = '靜心圓滿 · 餘韻長存';
+        toggleBtn.textContent = '完成並紀錄';
+        timerState.currentStage = 'completed';
+      }
     }
 
     function pauseTimer() {
       clearInterval(timerState.intervalId);
       timerState.intervalId = null;
+      AudioEngine.cancelScheduled();
+      releaseWakeLock();
+      stopBackgroundAudioSession();
+
       breatheRing.classList.remove('active');
       toggleBtn.textContent = '繼續靜心';
     }
@@ -1062,8 +1207,13 @@
     function resetTimer() {
       clearInterval(timerState.intervalId);
       timerState.intervalId = null;
+      AudioEngine.cancelScheduled();
+      releaseWakeLock();
+      stopBackgroundAudioSession();
+
       breatheRing.classList.remove('active');
       timerState.currentStage = 'idle';
+      timerState.stageEndTime = null;
       configPanel.style.opacity = '1';
       configPanel.style.pointerEvents = 'auto';
       toggleBtn.textContent = '開始靜心';
@@ -1079,9 +1229,16 @@
       updateTimerDisplay();
     }
 
+    // Sync on device wake-up (Visibility Change)
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && timerState.intervalId && timerState.stageEndTime) {
+        // App is visible again: immediately sync display with real-world time
+        tick();
+      }
+    });
+
     toggleBtn.addEventListener('click', () => {
       if (timerState.currentStage === 'completed') {
-        // Pre-fill record form and jump to record tab
         document.querySelector(`.tab-btn[data-tab="record"]`).click();
         presetRecordForm(timerState.staticMins, timerState.hasDynamic, timerState.dynamicMins);
         resetTimer();
@@ -1097,24 +1254,17 @@
 
     resetBtn.addEventListener('click', resetTimer);
 
-    // Bell test button
     document.getElementById('btn-bell-test').addEventListener('click', () => {
       AudioEngine.playSound();
     });
 
-    // --- Sound Settings (Type & Volume) ---
+    // Sound selection and volume
     const soundChips = document.querySelectorAll('#sound-type-chips .chip');
     const soundDesc = document.getElementById('selected-sound-desc');
     const volumeSlider = document.getElementById('sound-volume-slider');
     const volumeDesc = document.getElementById('volume-val-desc');
 
-    const soundNames = {
-      bowl: '沉穩藏缽',
-      chime: '空靈引罄',
-      zen: '柔和禪磬'
-    };
-
-    // Restore saved sound settings
+    const soundNames = { bowl: '沉穩藏缽', chime: '空靈引罄', zen: '柔和禪磬' };
     const savedSound = localStorage.getItem('mindful_sound_type') || 'bowl';
     const savedVol = localStorage.getItem('mindful_sound_volume') || '0.7';
 
@@ -1133,7 +1283,7 @@
         AudioEngine.setSoundType(stype);
         if (soundDesc) soundDesc.textContent = soundNames[stype];
         localStorage.setItem('mindful_sound_type', stype);
-        AudioEngine.playSound(); // Preview immediately
+        AudioEngine.playSound();
       });
     });
 
@@ -1145,10 +1295,9 @@
         localStorage.setItem('mindful_sound_volume', val);
       });
       volumeSlider.addEventListener('change', () => {
-        AudioEngine.playSound(); // Short preview on release
+        AudioEngine.playSound();
       });
     }
-
 
     // --- Record Form Handling ---
     let selectedStaticMins = 15;
@@ -1192,7 +1341,6 @@
       });
     });
 
-    // Tag selections
     document.querySelectorAll('.tag-choice').forEach(tag => {
       tag.addEventListener('click', () => {
         tag.classList.toggle('selected');
@@ -1204,7 +1352,17 @@
       e.preventDefault();
 
       const mindTags = Array.from(document.querySelectorAll('#mind-tags .tag-choice.selected')).map(el => el.textContent);
+      const customMind = document.getElementById('custom-mind-status').value.trim();
+      if (customMind) {
+        mindTags.push(customMind);
+      }
+
       const bodyTags = Array.from(document.querySelectorAll('#body-tags .tag-choice.selected')).map(el => el.textContent);
+      const customBody = document.getElementById('custom-body-status').value.trim();
+      if (customBody) {
+        bodyTags.push(customBody);
+      }
+
       const ideaText = document.getElementById('record-idea').value.trim();
 
       const newEntry = {
@@ -1230,15 +1388,16 @@
 
       saveData();
 
-      // Reset form tags
+      // Reset
       document.querySelectorAll('.tag-choice.selected').forEach(el => el.classList.remove('selected'));
+      document.getElementById('custom-mind-status').value = '';
+      document.getElementById('custom-body-status').value = '';
       document.getElementById('record-idea').value = '';
       alert('已安放今日靜心紀錄。');
       document.querySelector(`.tab-btn[data-tab="history"]`).click();
     });
 
-    // --- Render History & Ideas ---
-    
+    // --- Streak & Total Time Calculation ---
     function calculateStreak() {
       if (!appData.records || appData.records.length === 0) return 0;
       
@@ -1280,9 +1439,31 @@
       return streak;
     }
 
+    function calculateTotalTime() {
+      if (!appData.records || appData.records.length === 0) return "0 分鐘";
+      let totalMins = 0;
+      appData.records.forEach(r => {
+        totalMins += (r.staticMins || 0);
+        if (r.hasDynamic && r.dynamicMins) {
+          totalMins += r.dynamicMins;
+        }
+      });
+
+      if (totalMins < 60) {
+        return `${totalMins} 分鐘`;
+      }
+      const hrs = Math.floor(totalMins / 60);
+      const mins = totalMins % 60;
+      return mins > 0 ? `${hrs} 小時 ${mins} 分` : `${hrs} 小時`;
+    }
+
     function renderHistory() {
       const streakEl = document.getElementById("streak-days-count");
       if (streakEl) streakEl.textContent = calculateStreak();
+
+      const totalTimeEl = document.getElementById("total-meditation-time");
+      if (totalTimeEl) totalTimeEl.textContent = calculateTotalTime();
+
       const container = document.getElementById('history-list');
       if (appData.records.length === 0) {
         container.innerHTML = '<div class="empty-tip card">尚無靜心紀錄。在靜寂中留下第一筆足跡吧。</div>';
@@ -1297,11 +1478,11 @@
             靜心 ${r.staticMins} 分鐘
             ${r.hasDynamic ? `<span style="font-size:15px; color:var(--text-muted); font-weight:normal; margin-left:6px;">(動態鬆身 ${r.dynamicMins} 分鐘)</span>` : ''}
           </div>
-          ${r.mindStatus.length ? `
+          ${r.mindStatus && r.mindStatus.length ? `
             <div class="entry-tags">
-              ${r.mindStatus.map(t => `<span class="entry-tag" style="background:var(--accent-sage-soft); color:var(--accent-sage);">${t}</span>`).join('')}
+              ${r.mindStatus.map(t => `<span class="entry-tag" style="background:var(--accent-sage-soft); color:var(--accent-sage); font-weight:500;">${t}</span>`).join('')}
             </div>` : ''}
-          ${r.bodyStatus.length ? `
+          ${r.bodyStatus && r.bodyStatus.length ? `
             <div class="entry-tags">
               ${r.bodyStatus.map(t => `<span class="entry-tag">${t}</span>`).join('')}
             </div>` : ''}
@@ -1342,7 +1523,7 @@
       }
     }
 
-    // --- Quick Idea Modal Flow ---
+    // Quick Idea Modal
     const modal = document.getElementById('quick-idea-modal');
     document.getElementById('btn-quick-idea').addEventListener('click', () => {
       document.getElementById('quick-idea-text').value = '';
@@ -1365,7 +1546,7 @@
         modal.classList.remove('open');
       }
     });
-  
+
     // --- Data Backup & Restore (Export / Import JSON) ---
     document.getElementById('btn-export-data').addEventListener('click', () => {
       const exportPayload = {
@@ -1441,7 +1622,6 @@
       };
       reader.readAsText(file);
     });
-
   </script>
 </body>
 </html>
