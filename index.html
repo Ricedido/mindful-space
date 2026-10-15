@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>靜心空間 · Mindful Space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #FAF8F5;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-subtle: #F3EFEA;
+      --text-main: #2C2C2A;
+      --text-muted: #7E7C77;
+      --text-light: #A3A19B;
+      --accent-sage: #6B7F6D;
+      --accent-sage-soft: #E5ECE4;
+      --accent-clay: #B36B51;
+      --accent-clay-soft: #F7EBE6;
+      --accent-sand: #D5C7B6;
+      --border-color: #E8E2D9;
+      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.04);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --font-serif: "Noto Serif TC", "Songti TC", Georgia, serif;
+      --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px 16px 80px 16px;
+      background-image: radial-gradient(circle at 10% 10%, rgba(229, 236, 228, 0.4) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 90%, rgba(247, 235, 230, 0.4) 0%, transparent 45%);
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 580px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Header */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 4px;
+    }
+
+    .app-title h1 {
+      font-family: var(--font-serif);
+      font-size: 30px;
+      font-weight: 400;
+      letter-spacing: 2.5px;
+      color: var(--text-main);
+    }
+
+    .app-title p {
+      font-size: 15px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-top: 3px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .icon-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+      transition: all 0.25s ease;
+    }
+
+    .icon-btn:hover {
+      color: var(--text-main);
+      border-color: var(--accent-sand);
+      transform: translateY(-1px);
+    }
+
+    /* Tabs */
+    .nav-tabs {
+      display: flex;
+      background: rgba(232, 226, 217, 0.45);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      backdrop-filter: blur(8px);
+    }
+
+    .tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 10px 0;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: var(--font-sans);
+    }
+
+    .tab-btn.active {
+      background: #FFFFFF;
+      color: var(--text-main);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      font-weight: 600;
+    }
+
+    /* Card Panels */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(12px);
+    }
+
+    /* Timer Screen */
+    .timer-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .breathe-wrapper {
+      position: relative;
+      width: 240px;
+      height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0;
+    }
+
+    .breathe-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(107, 127, 109, 0.15) 0%, rgba(107, 127, 109, 0.02) 70%, transparent 100%);
+      transition: all 0.5s ease;
+    }
+
+    .breathe-ring.active {
+      animation: pulseBreathe 8s infinite ease-in-out;
+    }
+
+    @keyframes pulseBreathe {
+      0%, 100% { transform: scale(0.92); opacity: 0.5; }
+      50% { transform: scale(1.15); opacity: 0.95; }
+    }
+
+    .timer-display {
+      position: relative;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .timer-stage {
+      font-size: 15px;
+      color: var(--accent-sage);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .timer-digits {
+      font-size: 56px;
+      font-family: var(--font-serif);
+      font-weight: 300;
+      color: var(--text-main);
+      letter-spacing: 1px;
+    }
+
+    .timer-controls {
+      display: flex;
+      gap: 14px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn-main {
+      background: var(--text-main);
+      color: #FAF8F5;
+      border: none;
+      border-radius: 30px;
+      padding: 14px 42px;
+      font-size: 17px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 14px rgba(44, 44, 42, 0.18);
+    }
+
+    .btn-main:hover {
+      background: #181816;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--card-subtle);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 30px;
+      padding: 14px 28px;
+      font-size: 17px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #ECE6DD;
+    }
+
+    /* Duration Selector */
+    .config-section {
+      width: 100%;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .config-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .config-label {
+      font-size: 15px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chip-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 15.5px;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+    }
+
+    .chip.active {
+      background: var(--accent-sage-soft);
+      border-color: var(--accent-sage);
+      color: var(--accent-sage);
+      font-weight: 600;
+    }
+
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 26px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #D6D1C9;
+      transition: .3s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent-sage);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    /* Record Sheet / Form */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      font-size: 15.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .tag-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag-choice {
+      padding: 8px 15px;
+      border: 1px solid var(--border-color);
+      background: #FFFFFF;
+      border-radius: 22px;
+      font-size: 15px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tag-choice.selected {
+      background: var(--accent-clay-soft);
+      border-color: var(--accent-clay);
+      color: var(--accent-clay);
+      font-weight: 500;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 13px 15px;
+      font-size: 16px;
+      background: #FFFFFF;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      outline: none;
+      resize: vertical;
+    }
+
+    textarea:focus, input[type="text"]:focus {
+      border-color: var(--accent-sage);
+    }
+
+    /* History & Idea Vault */
+    .entry-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .entry-date {
+      font-size: 14px;
+      color: var(--text-light);
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .entry-duration {
+      font-size: 19px;
+      font-family: var(--font-serif);
+      font-weight: 600;
+      color: var(--accent-sage);
+      margin-bottom: 8px;
+    }
+
+    .entry-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0;
+    }
+
+    .entry-tag {
+      font-size: 13px;
+      background: var(--card-subtle);
+      color: var(--text-muted);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .entry-idea {
+      margin-top: 10px;
+      padding: 10px;
+      background: #FFFDF9;
+      border-left: 3px solid var(--accent-clay);
+      font-size: 15.5px;
+      line-height: 1.6;
+      color: var(--text-main);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .del-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .del-btn:hover {
+      color: var(--accent-clay);
+    }
+
+    /* Modal for Quick Idea */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(44, 44, 42, 0.45);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: #FFFFFF;
+      width: 100%;
+      max-width: 440px;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    }
+
+    .modal-header {
+      font-family: var(--font-serif);
+      font-size: 21px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .empty-tip {
+      text-align: center;
+      padding: 36px 0;
+      color: var(--text-light);
+      font-size: 16px;
+      font-family: var(--font-serif);
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="app-title">
+        <h1>靜 心 空 間</h1>
+        <p>留一段澄澈與自己同在</p>
+      </div>
+      <div class="header-actions">
+        <!-- Quick Idea Modal Trigger -->
+        <button class="icon-btn" id="btn-quick-idea" title="速記靈感">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18h6"/><path d="M10 22h4"/>
+            <path d="M12 2a7 7 0 0 0-7 7c0 2.5 1.5 4.5 3 6h8c1.5-1.5 3-3.5 3-6a7 7 0 0 0-7-7z"/>
+          </svg>
+        </button>
+        <!-- Bell / Sound Test -->
+        <button class="icon-btn" id="btn-bell-test" title="敲響頌缽">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="timer">計時與當下</button>
+      <button class="tab-btn" data-tab="record">填寫紀錄</button>
+      <button class="tab-btn" data-tab="history">覺察軌跡</button>
+      <button class="tab-btn" data-tab="ideas">靈光庫</button>
+    </nav>
+
+    <!-- TAB 1: Timer & Practice -->
+    <div id="view-timer" class="tab-content card">
+      <div class="timer-container">
+        <div class="breathe-wrapper">
+          <div class="breathe-ring" id="breathe-ring"></div>
+          <div class="timer-display">
+            <div class="timer-stage" id="timer-stage-title">準備靜心</div>
+            <div class="timer-digits" id="timer-digits">15:00</div>
+          </div>
+        </div>
+
+        <div class="timer-controls">
+          <button class="btn-main" id="btn-timer-toggle">開始靜心</button>
+          <button class="btn-secondary" id="btn-timer-reset" style="display:none;">重置</button>
+        </div>
+
+        <!-- Configuration -->
+        <div class="config-section" id="timer-config-panel">
+          <!-- Static Meditation Duration (Min 15 min) -->
+          <div class="config-row">
+            <div class="config-label">
+              <span>坐禪／靜心時長</span>
+              <span id="selected-static-desc">15 分鐘</span>
+            </div>
+            <div class="chip-group" id="static-chip-group">
+              <button class="chip active" data-mins="15">15 分鐘</button>
+              <button class="chip" data-mins="20">20 分鐘</button>
+              <button class="chip" data-mins="30">30 分鐘</button>
+              <button class="chip" data-mins="45">45 分鐘</button>
+              <button class="chip" data-mins="60">60 分鐘</button>
+            </div>
+          </div>
+
+          <!-- Dynamic Meditation Toggle -->
+          <div class="config-row">
+            <div class="toggle-row">
+              <span style="font-size: 15.5px; color: var(--text-main);">先進行動態靜心（甩手 / 鬆身）</span>
+              <label class="switch">
+                <input type="checkbox" id="check-dynamic">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div id="dynamic-duration-box" style="display:none; margin-top: 8px;">
+              <div class="config-label" style="margin-bottom: 6px;">動態時長</div>
+              <div class="chip-group" id="dynamic-chip-group">
+                <button class="chip active" data-mins="5">5 分鐘</button>
+                <button class="chip" data-mins="10">10 分鐘</button>
+                <button class="chip" data-mins="15">15 分鐘</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily Reminder Toggle -->
+          <div class="config-row">
+            <div class="toggle-row">
+              <div>
+                <div style="font-size: 15.5px; color: var(--text-main);">每日靜心提醒</div>
+                <div style="font-size: 15px; color: var(--text-muted);">固定於設定時間推播溫和提醒</div>
+              </div>
+              <input type="time" id="reminder-time" value="21:30" style="padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Manual Record -->
+    <div id="view-record" class="tab-content card" style="display: none;">
+      <form id="record-form">
+        <!-- Duration Input -->
+        <div class="form-group">
+          <label>本次靜心時長（至少 15 分鐘）</label>
+          <div class="chip-group" id="form-static-chips">
+            <button type="button" class="chip active" data-val="15">15 分鐘</button>
+            <button type="button" class="chip" data-val="20">20 分鐘</button>
+            <button type="button" class="chip" data-val="30">30 分鐘</button>
+            <button type="button" class="chip" data-val="45">45 分鐘</button>
+            <button type="button" class="chip" data-val="60">60 分鐘</button>
+          </div>
+        </div>
+
+        <!-- Dynamic Meditation Record -->
+        <div class="form-group">
+          <div class="toggle-row" style="margin-bottom: 8px;">
+            <label style="margin: 0;">是否有先進行動態靜心？</label>
+            <label class="switch">
+              <input type="checkbox" id="form-has-dynamic">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div id="form-dynamic-select" style="display: none;">
+            <div class="chip-group" id="form-dynamic-chips">
+              <button type="button" class="chip active" data-val="5">動態 5 分鐘</button>
+              <button type="button" class="chip" data-val="10">動態 10 分鐘</button>
+              <button type="button" class="chip" data-val="15">動態 15 分鐘</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mind Status -->
+        <div class="form-group">
+          <label>靜心狀態（心智流轉）</label>
+          <div class="tag-grid" id="mind-tags">
+            <span class="tag-choice">深沉澄澈</span>
+            <span class="tag-choice">專注安穩</span>
+            <span class="tag-choice">念頭流轉</span>
+            <span class="tag-choice">浮躁逐漸歸位</span>
+            <span class="tag-choice">些許昏沉</span>
+            <span class="tag-choice">時間感消融</span>
+          </div>
+        </div>
+
+        <!-- Body Awareness -->
+        <div class="form-group">
+          <label>身體覺察（痠、痛、麻、通透）</label>
+          <div class="tag-grid" id="body-tags">
+            <span class="tag-choice">放鬆通透</span>
+            <span class="tag-choice">肩頸微緊</span>
+            <span class="tag-choice">腰背痠脹</span>
+            <span class="tag-choice">雙腿發麻</span>
+            <span class="tag-choice">呼吸深長舒緩</span>
+            <span class="tag-choice">胸口微悶已開</span>
+            <span class="tag-choice">溫熱氣感</span>
+          </div>
+        </div>
+
+        <!-- Inspiration / Idea -->
+        <div class="form-group">
+          <label>靜心中浮現的靈光／洞見 (Idea)</label>
+          <textarea id="record-idea" rows="3" placeholder="記錄當下浮現的念頭、靈感或對生活的洞察..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-main" style="width: 100%;">安放今日覺察</button>
+      </form>
+    </div>
+
+    <!-- TAB 3: History -->
+    <div id="view-history" class="tab-content" style="display: none;">
+      <!-- 連續靜心 累積卡片 -->
+      <div class="card" style="margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; padding: 18px 22px;">
+        <div>
+          <div style="font-size: 14.5px; color: var(--text-muted); letter-spacing: 1px;">實修積累</div>
+          <div style="font-size: 17px; font-weight: 500; color: var(--text-main); margin-top: 2px;">連續靜心</div>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 4px;">
+          <span id="streak-days-count" style="font-size: 38px; font-family: var(--font-serif); color: var(--accent-sage); font-weight: 600;">0</span>
+          <span style="font-size: 15px; color: var(--text-muted);">天</span>
+        </div>
+      </div>
+      <div id="history-list"></div>
+    </div>
+
+    <!-- TAB 4: Ideas Vault -->
+    <div id="view-ideas" class="tab-content" style="display: none;">
+      <div id="ideas-list"></div>
+    </div>
+  </div>
+
+  <!-- Quick Idea Modal -->
+  <div class="modal-overlay" id="quick-idea-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span>速記靈光</span>
+        <button class="del-btn" id="btn-close-modal" style="position:static;">✕</button>
+      </div>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">將浮現的靈感放下，繼續回到呼吸。</p>
+      <textarea id="quick-idea-text" rows="4" placeholder="寫下剛剛冒出來的念頭或靈感..."></textarea>
+      <div style="display:flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
+        <button class="btn-secondary" id="btn-cancel-quick-idea" style="padding: 8px 18px; font-size: 13px;">取消</button>
+        <button class="btn-main" id="btn-save-quick-idea" style="padding: 8px 20px; font-size: 13px;">留存靈光</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Audio Synthesis (Tibetan Singing Bowl via Web Audio API) ---
+    const AudioEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      },
+      playBowl() {
+        this.init();
+        const now = this.ctx.currentTime;
+        const baseFreq = 216; // A warm, grounding Tibetan bowl pitch
+        const harmonics = [1, 2.76, 5.4, 8.9];
+        const gains = [0.6, 0.25, 0.12, 0.05];
+
+        harmonics.forEach((harmonic, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(baseFreq * harmonic, now);
+
+          gain.gain.setValueAtTime(gains[idx], now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 4.5);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 4.6);
+        });
+      }
+    };
+
+    // --- State Management & Storage ---
+    const DB_KEY = 'mindful_space_data_v1';
+    let appData = JSON.parse(localStorage.getItem(DB_KEY)) || {
+      records: [],
+      ideas: []
+    };
+
+    function saveData() {
+      localStorage.setItem(DB_KEY, JSON.stringify(appData));
+    }
+
+    // --- App Flow & Tab Switching ---
+    const tabs = document.querySelectorAll('.tab-btn');
+    const tabContents = {
+      timer: document.getElementById('view-timer'),
+      record: document.getElementById('view-record'),
+      history: document.getElementById('view-history'),
+      ideas: document.getElementById('view-ideas')
+    };
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const target = tab.dataset.tab;
+
+        Object.keys(tabContents).forEach(key => {
+          tabContents[key].style.display = key === target ? 'block' : 'none';
+        });
+
+        if (target === 'history') renderHistory();
+        if (target === 'ideas') renderIdeas();
+      });
+    });
+
+    // --- Timer System ---
+    let timerState = {
+      hasDynamic: false,
+      dynamicMins: 5,
+      staticMins: 15, // Default minimum 15 mins
+      currentStage: 'idle', // 'dynamic', 'static', 'completed'
+      secondsLeft: 15 * 60,
+      totalSeconds: 15 * 60,
+      intervalId: null
+    };
+
+    const digitsEl = document.getElementById('timer-digits');
+    const stageTitleEl = document.getElementById('timer-stage-title');
+    const toggleBtn = document.getElementById('btn-timer-toggle');
+    const resetBtn = document.getElementById('btn-timer-reset');
+    const breatheRing = document.getElementById('breathe-ring');
+    const configPanel = document.getElementById('timer-config-panel');
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateTimerDisplay() {
+      digitsEl.textContent = formatTime(timerState.secondsLeft);
+    }
+
+    // Chip selectors
+    document.querySelectorAll('#static-chip-group .chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (timerState.currentStage !== 'idle') return;
+        document.querySelectorAll('#static-chip-group .chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        timerState.staticMins = parseInt(btn.dataset.mins, 10);
+        document.getElementById('selected-static-desc').textContent = `${timerState.staticMins} 分鐘`;
+        if (!timerState.hasDynamic) {
+          timerState.secondsLeft = timerState.staticMins * 60;
+          updateTimerDisplay();
+        }
+      });
+    });
+
+    const checkDynamic = document.getElementById('check-dynamic');
+    const dynamicBox = document.getElementById('dynamic-duration-box');
+    checkDynamic.addEventListener('change', (e) => {
+      timerState.hasDynamic = e.target.checked;
+      dynamicBox.style.display = timerState.hasDynamic ? 'block' : 'none';
+      if (timerState.hasDynamic) {
+        timerState.secondsLeft = timerState.dynamicMins * 60;
+        stageTitleEl.textContent = '準備：動態靜心';
+      } else {
+        timerState.secondsLeft = timerState.staticMins * 60;
+        stageTitleEl.textContent = '準備：坐禪靜心';
+      }
+      updateTimerDisplay();
+    });
+
+    document.querySelectorAll('#dynamic-chip-group .chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (timerState.currentStage !== 'idle') return;
+        document.querySelectorAll('#dynamic-chip-group .chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        timerState.dynamicMins = parseInt(btn.dataset.mins, 10);
+        if (timerState.hasDynamic) {
+          timerState.secondsLeft = timerState.dynamicMins * 60;
+          updateTimerDisplay();
+        }
+      });
+    });
+
+    // Timer Run Logic
+    function startTimer() {
+      AudioEngine.playBowl();
+      breatheRing.classList.add('active');
+      configPanel.style.opacity = '0.4';
+      configPanel.style.pointerEvents = 'none';
+      resetBtn.style.display = 'inline-block';
+      toggleBtn.textContent = '暫停';
+
+      if (timerState.currentStage === 'idle') {
+        if (timerState.hasDynamic) {
+          timerState.currentStage = 'dynamic';
+          stageTitleEl.textContent = '動態靜心（鬆身甩手）';
+          timerState.secondsLeft = timerState.dynamicMins * 60;
+        } else {
+          timerState.currentStage = 'static';
+          stageTitleEl.textContent = '坐禪靜心';
+          timerState.secondsLeft = timerState.staticMins * 60;
+        }
+      }
+
+      timerState.intervalId = setInterval(() => {
+        if (timerState.secondsLeft > 0) {
+          timerState.secondsLeft--;
+          updateTimerDisplay();
+        } else {
+          // Stage Transition or Complete
+          if (timerState.currentStage === 'dynamic') {
+            AudioEngine.playBowl();
+            timerState.currentStage = 'static';
+            stageTitleEl.textContent = '坐禪靜心';
+            timerState.secondsLeft = timerState.staticMins * 60;
+            updateTimerDisplay();
+          } else {
+            // Finished
+            clearInterval(timerState.intervalId);
+            AudioEngine.playBowl();
+            breatheRing.classList.remove('active');
+            stageTitleEl.textContent = '靜心圓滿';
+            toggleBtn.textContent = '完成並紀錄';
+            timerState.currentStage = 'completed';
+          }
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(timerState.intervalId);
+      timerState.intervalId = null;
+      breatheRing.classList.remove('active');
+      toggleBtn.textContent = '繼續靜心';
+    }
+
+    function resetTimer() {
+      clearInterval(timerState.intervalId);
+      timerState.intervalId = null;
+      breatheRing.classList.remove('active');
+      timerState.currentStage = 'idle';
+      configPanel.style.opacity = '1';
+      configPanel.style.pointerEvents = 'auto';
+      toggleBtn.textContent = '開始靜心';
+      resetBtn.style.display = 'none';
+
+      if (timerState.hasDynamic) {
+        stageTitleEl.textContent = '準備：動態靜心';
+        timerState.secondsLeft = timerState.dynamicMins * 60;
+      } else {
+        stageTitleEl.textContent = '準備：坐禪靜心';
+        timerState.secondsLeft = timerState.staticMins * 60;
+      }
+      updateTimerDisplay();
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      if (timerState.currentStage === 'completed') {
+        // Pre-fill record form and jump to record tab
+        document.querySelector(`.tab-btn[data-tab="record"]`).click();
+        presetRecordForm(timerState.staticMins, timerState.hasDynamic, timerState.dynamicMins);
+        resetTimer();
+        return;
+      }
+
+      if (timerState.intervalId) {
+        pauseTimer();
+      } else {
+        startTimer();
+      }
+    });
+
+    resetBtn.addEventListener('click', resetTimer);
+
+    // Bell test button
+    document.getElementById('btn-bell-test').addEventListener('click', () => {
+      AudioEngine.playBowl();
+    });
+
+    // --- Record Form Handling ---
+    let selectedStaticMins = 15;
+    let selectedDynamicMins = 5;
+
+    function presetRecordForm(staticM, hasDyn, dynM) {
+      selectedStaticMins = staticM;
+      document.querySelectorAll('#form-static-chips .chip').forEach(c => {
+        c.classList.toggle('active', parseInt(c.dataset.val, 10) === staticM);
+      });
+      const formDynCheck = document.getElementById('form-has-dynamic');
+      formDynCheck.checked = hasDyn;
+      document.getElementById('form-dynamic-select').style.display = hasDyn ? 'block' : 'none';
+      if (hasDyn) {
+        selectedDynamicMins = dynM;
+        document.querySelectorAll('#form-dynamic-chips .chip').forEach(c => {
+          c.classList.toggle('active', parseInt(c.dataset.val, 10) === dynM);
+        });
+      }
+    }
+
+    document.querySelectorAll('#form-static-chips .chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#form-static-chips .chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        selectedStaticMins = parseInt(chip.dataset.val, 10);
+      });
+    });
+
+    const formHasDyn = document.getElementById('form-has-dynamic');
+    const formDynSelect = document.getElementById('form-dynamic-select');
+    formHasDyn.addEventListener('change', (e) => {
+      formDynSelect.style.display = e.target.checked ? 'block' : 'none';
+    });
+
+    document.querySelectorAll('#form-dynamic-chips .chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#form-dynamic-chips .chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        selectedDynamicMins = parseInt(chip.dataset.val, 10);
+      });
+    });
+
+    // Tag selections
+    document.querySelectorAll('.tag-choice').forEach(tag => {
+      tag.addEventListener('click', () => {
+        tag.classList.toggle('selected');
+      });
+    });
+
+    // Submit Record
+    document.getElementById('record-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const mindTags = Array.from(document.querySelectorAll('#mind-tags .tag-choice.selected')).map(el => el.textContent);
+      const bodyTags = Array.from(document.querySelectorAll('#body-tags .tag-choice.selected')).map(el => el.textContent);
+      const ideaText = document.getElementById('record-idea').value.trim();
+
+      const newEntry = {
+        id: Date.now(),
+        timestamp: Date.now(),
+        date: new Date().toLocaleString('zh-TW', { dateStyle: 'medium', timeStyle: 'short' }),
+        staticMins: selectedStaticMins,
+        hasDynamic: formHasDyn.checked,
+        dynamicMins: formHasDyn.checked ? selectedDynamicMins : 0,
+        mindStatus: mindTags,
+        bodyStatus: bodyTags,
+        idea: ideaText
+      };
+
+      appData.records.unshift(newEntry);
+      if (ideaText) {
+        appData.ideas.unshift({
+          id: Date.now(),
+          date: newEntry.date,
+          text: ideaText
+        });
+      }
+
+      saveData();
+
+      // Reset form tags
+      document.querySelectorAll('.tag-choice.selected').forEach(el => el.classList.remove('selected'));
+      document.getElementById('record-idea').value = '';
+      alert('已安放今日靜心紀錄。');
+      document.querySelector(`.tab-btn[data-tab="history"]`).click();
+    });
+
+    // --- Render History & Ideas ---
+    
+    function calculateStreak() {
+      if (!appData.records || appData.records.length === 0) return 0;
+      
+      const dateSet = new Set();
+      appData.records.forEach(r => {
+        if (r.timestamp) {
+          const d = new Date(r.timestamp);
+          const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+          dateSet.add(key);
+        } else if (r.date) {
+          dateSet.add(r.date.split(' ')[0]);
+        }
+      });
+
+      const today = new Date();
+      let streak = 0;
+      let checkDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+      const todayKey = `${checkDate.getFullYear()}-${String(checkDate.getMonth()+1).padStart(2,'0')}-${String(checkDate.getDate()).padStart(2,'0')}`;
+      let practicedToday = dateSet.has(todayKey);
+
+      if (!practicedToday) {
+        checkDate.setDate(checkDate.getDate() - 1);
+        const yestKey = `${checkDate.getFullYear()}-${String(checkDate.getMonth()+1).padStart(2,'0')}-${String(checkDate.getDate()).padStart(2,'0')}`;
+        if (!dateSet.has(yestKey)) {
+          return 0;
+        }
+      }
+
+      while (true) {
+        const key = `${checkDate.getFullYear()}-${String(checkDate.getMonth()+1).padStart(2,'0')}-${String(checkDate.getDate()).padStart(2,'0')}`;
+        if (dateSet.has(key)) {
+          streak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+      return streak;
+    }
+
+    function renderHistory() {
+      const streakEl = document.getElementById("streak-days-count");
+      if (streakEl) streakEl.textContent = calculateStreak();
+      const container = document.getElementById('history-list');
+      if (appData.records.length === 0) {
+        container.innerHTML = '<div class="empty-tip card">尚無靜心紀錄。在靜寂中留下第一筆足跡吧。</div>';
+        return;
+      }
+
+      container.innerHTML = appData.records.map(r => `
+        <div class="entry-card">
+          <button class="del-btn" onclick="deleteRecord(${r.id})">✕</button>
+          <div class="entry-date">${r.date}</div>
+          <div class="entry-duration">
+            靜心 ${r.staticMins} 分鐘
+            ${r.hasDynamic ? `<span style="font-size:15px; color:var(--text-muted); font-weight:normal; margin-left:6px;">(動態鬆身 ${r.dynamicMins} 分鐘)</span>` : ''}
+          </div>
+          ${r.mindStatus.length ? `
+            <div class="entry-tags">
+              ${r.mindStatus.map(t => `<span class="entry-tag" style="background:var(--accent-sage-soft); color:var(--accent-sage);">${t}</span>`).join('')}
+            </div>` : ''}
+          ${r.bodyStatus.length ? `
+            <div class="entry-tags">
+              ${r.bodyStatus.map(t => `<span class="entry-tag">${t}</span>`).join('')}
+            </div>` : ''}
+          ${r.idea ? `<div class="entry-idea"><strong>靈光：</strong>${r.idea}</div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function deleteRecord(id) {
+      if (confirm('確定刪除此筆紀錄嗎？')) {
+        appData.records = appData.records.filter(r => r.id !== id);
+        saveData();
+        renderHistory();
+      }
+    }
+
+    function renderIdeas() {
+      const container = document.getElementById('ideas-list');
+      if (appData.ideas.length === 0) {
+        container.innerHTML = '<div class="empty-tip card">靈感池空明澄澈。靜心時若有靈光浮現，可隨時記錄於此。</div>';
+        return;
+      }
+
+      container.innerHTML = appData.ideas.map(item => `
+        <div class="entry-card">
+          <button class="del-btn" onclick="deleteIdea(${item.id})">✕</button>
+          <div class="entry-date">${item.date}</div>
+          <div style="font-size:17px; line-height:1.6; color:var(--text-main);">${item.text}</div>
+        </div>
+      `).join('');
+    }
+
+    function deleteIdea(id) {
+      if (confirm('確定移除此靈感嗎？')) {
+        appData.ideas = appData.ideas.filter(i => i.id !== id);
+        saveData();
+        renderIdeas();
+      }
+    }
+
+    // --- Quick Idea Modal Flow ---
+    const modal = document.getElementById('quick-idea-modal');
+    document.getElementById('btn-quick-idea').addEventListener('click', () => {
+      document.getElementById('quick-idea-text').value = '';
+      modal.classList.add('open');
+      document.getElementById('quick-idea-text').focus();
+    });
+
+    document.getElementById('btn-close-modal').addEventListener('click', () => modal.classList.remove('open'));
+    document.getElementById('btn-cancel-quick-idea').addEventListener('click', () => modal.classList.remove('open'));
+
+    document.getElementById('btn-save-quick-idea').addEventListener('click', () => {
+      const text = document.getElementById('quick-idea-text').value.trim();
+      if (text) {
+        appData.ideas.unshift({
+          id: Date.now(),
+          date: new Date().toLocaleString('zh-TW', { dateStyle: 'medium', timeStyle: 'short' }),
+          text: text
+        });
+        saveData();
+        modal.classList.remove('open');
+      }
+    });
+  </script>
+</body>
+</html>
