@@ -628,7 +628,7 @@
     <header class="app-header">
       <div class="app-title">
         <h1>靜 心 空 間 <span class="app-version-tag">v2.7</span></h1>
-        <p>留一段澄澈與自己同在 · 最新版本</p>
+        <p>留一段澄澈與自己同在</p>
       </div>
       <div class="header-actions">
         <!-- Quick Idea Modal Trigger -->
@@ -713,21 +713,21 @@
           <div class="config-row">
             <div class="config-label">
               <span>準備期引導語音（15秒）</span>
-              <span id="selected-voice-desc">沉穩男中音（慢速）</span>
+              <span id="selected-voice-desc">沉穩男中音</span>
             </div>
             <div class="chip-group" id="voice-style-chips">
               <button type="button" class="chip active" data-voice="baritone">沉穩男中音</button>
-              <button type="button" class="chip" data-voice="shinchan">蠟筆小新</button>
               <button type="button" class="chip" data-voice="bell">靜謐微磬 (無口白)</button>
             </div>
-            <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
+            <div id="voice-select-row" style="display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap;">
               <button type="button" class="btn-secondary" id="btn-preview-voice" style="padding: 8px 16px; font-size: 13.5px; border-radius: 10px; display: flex; align-items: center; gap: 6px;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
                   <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
                 </svg>
-                試聽目前引導音
+                試聽引導音
               </button>
+              <select id="voice-select-dropdown" style="display: none; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13.5px; font-family: inherit; background: #FFF; color: var(--text-main); max-width: 200px;"></select>
             </div>
           </div>
 
@@ -875,10 +875,7 @@
           </button>
           <input type="file" id="file-import-input" accept=".json" style="display: none;">
         </div>
-        <div style="margin-top: 18px; padding-top: 12px; border-top: 1px dashed var(--border-color); text-align: center; font-size: 12.5px; color: var(--text-light); letter-spacing: 0.5px;">
-          靜心空間 · 當前版本 <strong>v2.7 (2026 最新版本)</strong><br>
-          已升級：台灣腔沉穩男中音（極慢速） · 提示音自動暫停手機音樂 · 實修純淨計時
-        </div>
+        
       </div>
     </div>
 
@@ -1049,10 +1046,11 @@
       }
     };
 
-    // --- Voice Guidance Engine v2.7 (台灣腔調 · 沉穩男中音 · 極緩慢步調) ---
+    // --- Voice Guidance Engine v2.7 (真實沉穩男中音優先 · 排除怪音與女聲) ---
     const VoiceGuide = {
       mode: localStorage.getItem('mindful_voice_mode') || 'baritone', // 'baritone', 'bell'
-      taiwanVoice: null,
+      chosenVoice: null,
+      maleVoiceFound: false,
 
       initVoices() {
         if (!('speechSynthesis' in window)) return;
@@ -1066,35 +1064,75 @@
           return !cantoneseKeywords.some(kw => checkStr.includes(kw));
         });
 
-        // 2. 嚴格尋找「台灣腔調」的中文語音 (zh-TW, cmn-Hant-TW, Taiwan)
-        const taiwanVoices = nonCantoneseVoices.filter(v => {
+        // 2. 獲取所有中文語音 (zh, cmn)
+        const zhVoices = nonCantoneseVoices.filter(v => {
           const l = (v.lang || '').toLowerCase();
-          const n = (v.name || '').toLowerCase();
-          return l.includes('tw') || l.includes('hant') || n.includes('taiwan') || n.includes('台灣') || n.includes('國語');
+          return l.startsWith('zh') || l.startsWith('cmn');
         });
 
-        // 3. 優先尋找台灣男聲 (如 Windows Danny, 或包含 male 的台灣語音)
-        const maleKeywords = ['danny', 'yunyang', 'yunjian', 'kangkang', 'li-mu', 'limu', 'bohai', 'male', '男', 'guy', 'david'];
-        let selected = taiwanVoices.find(v => {
+        // 3. 明確尋找男聲 (排除女聲關鍵字，優先匹配男聲名稱：立穆 Li-mu, Danny, 雲揚 Yunyang, 康康 Kangkang, 雲健 Yunjian, 博海 Bohai, Male, 男 等)
+        const maleKeywords = ['li-mu', 'limu', '立穆', 'danny', '丹尼', 'kangkang', '康康', 'yunyang', '云扬', '雲揚', 'yunjian', '云健', '雲健', 'bohai', '博海', 'male', '男', 'guy', 'david', 'henry'];
+        const femaleKeywords = ['mei-jia', 'meijia', 'ting-ting', 'tingting', 'sin-ji', 'sinji', 'yuna', 'yaoyao', 'xiaoxiao', 'xiaoyi', 'hiuga', 'zhiyu', 'yushu', 'female', '女', 'huihui', 'wanwan', '美佳', '美婷', '婷婷', '雅婷', '涵涵', 'yating', 'hanhan'];
+
+        // 第一步：在所有中文語音中尋找明確的男聲
+        let selected = zhVoices.find(v => {
           const n = (v.name || '').toLowerCase();
-          return maleKeywords.some(mk => n.includes(mk));
+          const isFemale = femaleKeywords.some(fk => n.includes(fk));
+          const isMale = maleKeywords.some(mk => n.includes(mk));
+          return isMale && !isFemale;
         });
 
-        // 若無明確標記為男聲的台灣語音，使用台灣預設語音
-        if (!selected && taiwanVoices.length > 0) {
-          selected = taiwanVoices[0];
+        if (selected) {
+          this.maleVoiceFound = true;
+        } else {
+          // 第二步：尋找未被標註為女聲的中文語音
+          selected = zhVoices.find(v => {
+            const n = (v.name || '').toLowerCase();
+            return !femaleKeywords.some(fk => n.includes(fk));
+          });
+          if (selected) this.maleVoiceFound = true;
         }
 
-        // 若仍無，備選非粵語之繁體中文語音
-        if (!selected && nonCantoneseVoices.length > 0) {
-          selected = nonCantoneseVoices.find(v => (v.lang || '').startsWith('zh')) || nonCantoneseVoices[0];
+        // 第三步：若裝置只有預設中文語音（如 iOS 僅預載 Mei-Jia），則備選台灣語音，但絕不施加怪異破音
+        if (!selected && zhVoices.length > 0) {
+          selected = zhVoices.find(v => (v.lang || '').toLowerCase().includes('tw')) || zhVoices[0];
+          this.maleVoiceFound = false;
         }
 
-        this.taiwanVoice = selected || allVoices[0];
+        this.chosenVoice = selected || allVoices[0];
 
+        // 更新介面
         const voiceDesc = document.getElementById('selected-voice-desc');
-        if (voiceDesc && this.taiwanVoice && this.mode === 'baritone') {
-          voiceDesc.textContent = '沉穩男中音（台灣腔調·極緩慢）';
+        if (voiceDesc && this.mode === 'baritone') {
+          if (this.maleVoiceFound && this.chosenVoice) {
+            voiceDesc.textContent = `沉穩男中音 (${this.chosenVoice.name.replace(/Microsoft|Google|Apple/g, '').trim()})`;
+          } else {
+            voiceDesc.textContent = '沉穩引導';
+          }
+        }
+
+        // 若有多個中文語音，顯示下拉選單讓使用者可自由切換試聽
+        const selectEl = document.getElementById('voice-select-dropdown');
+        if (selectEl && zhVoices.length > 1) {
+          selectEl.style.display = 'inline-block';
+          selectEl.innerHTML = '';
+          zhVoices.forEach((v, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            const n = (v.name || '').toLowerCase();
+            const isMale = maleKeywords.some(mk => n.includes(mk));
+            opt.textContent = `${v.name.replace(/Microsoft|Google|Apple/g, '').trim()} ${isMale ? '(男聲)' : ''}`;
+            if (v === this.chosenVoice) opt.selected = true;
+            selectEl.appendChild(opt);
+          });
+          selectEl.onchange = (e) => {
+            this.chosenVoice = zhVoices[parseInt(e.target.value, 10)];
+            const n = (this.chosenVoice.name || '').toLowerCase();
+            this.maleVoiceFound = maleKeywords.some(mk => n.includes(mk));
+            if (voiceDesc && this.mode === 'baritone') {
+              voiceDesc.textContent = `沉穩引導 (${this.chosenVoice.name.replace(/Microsoft|Google|Apple/g, '').trim()})`;
+            }
+          };
         }
       },
 
@@ -1110,7 +1148,6 @@
             speech: ''
           };
         } else {
-          // 沉穩男中音（台灣中文）：帶有充裕呼吸留白、深厚悠長
           return {
             caption: '身體放鬆，脊椎打直，身體重心擺正，準備開始靜心。',
             speech: '身體放鬆…… 脊椎打直…… 身體重心擺正…… 準備開始靜心。'
@@ -1131,28 +1168,28 @@
         const script = this.getGuideScript();
         if (!script.speech) return;
 
-        // 說話前暫停手機其他背景音樂（Spotify/Apple Music）
+        // 說話前先播放微音以接管手機音訊焦點（暫停背景 Spotify / Apple Music）
         const focusPlayer = document.getElementById('audio-focus-player');
         if (focusPlayer) {
           try {
             focusPlayer.src = SOUND_AUDIO_DATA.bowl;
-            focusPlayer.volume = 0.001; // 微音觸發系統音訊焦點切換
+            focusPlayer.volume = 0.001;
+            focusPlayer.currentTime = 0;
             focusPlayer.play().catch(() => {});
           } catch(e) {}
         }
 
         const utterance = new SpeechSynthesisUtterance(script.speech);
-        if (this.taiwanVoice) {
-          utterance.voice = this.taiwanVoice;
+        if (this.chosenVoice) {
+          utterance.voice = this.chosenVoice;
         }
-        // 強制設定為台灣正體中文
-        utterance.lang = 'zh-TW';
+        utterance.lang = (this.chosenVoice && this.chosenVoice.lang) ? this.chosenVoice.lang : 'zh-TW';
 
-        // 沉穩男中音調諧：
-        // pitch: 0.48（顯著下沉，消除尖細感，展現低頻共振）
-        // rate: 0.50（極其緩慢沉著，與深長吐納同步）
-        utterance.pitch = 0.48;
-        utterance.rate = 0.50;
+        // 採用自然舒服的沉穩男中音參數：
+        // pitch: 0.88（自然沉穩溫和，絕不破音或產生怪異機械雜音）
+        // rate: 0.70（從容舒緩，與呼吸節奏合一）
+        utterance.pitch = 0.88;
+        utterance.rate = 0.70;
         utterance.volume = 1.0;
 
         window.speechSynthesis.speak(utterance);
@@ -1173,14 +1210,14 @@
       const voiceDesc = document.getElementById('selected-voice-desc');
       const savedMode = localStorage.getItem('mindful_voice_mode') || 'baritone';
 
-      VoiceGuide.setMode(savedMode === 'shinchan' ? 'baritone' : savedMode);
+      VoiceGuide.setMode(savedMode === 'bell' ? 'bell' : 'baritone');
 
       const modeNames = {
-        baritone: '沉穩男中音（台灣腔調·極緩慢）',
-        bell: '靜謐微磬（無口白）'
+        baritone: '沉穩男中音',
+        bell: '靜謐微磬 (無口白)'
       };
 
-      if (voiceDesc) voiceDesc.textContent = modeNames[VoiceGuide.mode] || '沉穩男中音（台灣腔調·極緩慢）';
+      if (voiceDesc) voiceDesc.textContent = modeNames[VoiceGuide.mode] || '沉穩男中音';
       voiceChips.forEach(chip => {
         chip.classList.toggle('active', chip.dataset.voice === VoiceGuide.mode);
         chip.addEventListener('click', () => {
@@ -1359,7 +1396,7 @@
       const script = VoiceGuide.getGuideScript();
       guideCaptionEl.textContent = script.caption;
 
-      // 依選定之模式（沉穩男中音極慢速 / 蠟筆小新 / 靜謐微磬）進行引導
+      // 依選定之模式（沉穩男中音 / 靜謐微磬）進行引導
       VoiceGuide.speak();
       updateTimerDisplay();
     }
