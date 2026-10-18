@@ -66,9 +66,9 @@
 
     .app-title h1 {
       font-family: var(--font-serif);
-      font-size: 30px;
-      font-weight: 400;
-      letter-spacing: 2.5px;
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: 2.8px;
       color: var(--text-main);
     }
 
@@ -421,64 +421,85 @@
       border-color: var(--accent-sage);
     }
 
-    /* Stats Dashboard v2.9 (三欄數值 + 30天圓點矩陣) */
+    /* Stats Dashboard v2.9 (字體2: 古典優雅襯線體 + 手機換行防溢 + 3排x10顆圓點) */
     .stats-dashboard {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
-      padding: 24px 20px 20px 20px;
+      padding: 22px 16px 18px 16px;
       margin-bottom: 20px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
       box-shadow: var(--shadow-soft);
       backdrop-filter: blur(12px);
     }
 
     .stats-top-row {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1.25fr 1fr;
       text-align: center;
       align-items: flex-end;
+      gap: 4px;
     }
 
     .stat-col {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      justify-content: flex-end;
+      gap: 6px;
     }
 
+    /* 數字字體2：古典優雅襯線體 (Noto Serif TC / Georgia) */
     .stat-main-num {
-      font-size: 42px;
       font-family: var(--font-serif);
-      color: #A86536;
-      line-height: 1.1;
-      font-weight: 400;
+      font-size: 38px;
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: 0.5px;
+    }
+
+    #streak-days-count {
+      color: var(--accent-sage);
+    }
+
+    #total-meditation-time {
+      color: var(--text-main);
+      font-size: 23px;
+      font-weight: 600;
+      word-break: keep-all;
+    }
+
+    #total-days-count {
+      color: var(--accent-clay);
     }
 
     .stat-main-label {
-      font-family: var(--font-serif);
-      font-size: 15.5px;
-      color: #6E685F;
-      letter-spacing: 1.5px;
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.35;
+      letter-spacing: 0.6px;
+      text-align: center;
     }
 
-    /* 30 顆圓點容器 (2行 x 15顆) */
+    /* 30 顆圓點容器 (3行 x 10顆 = 30天一循環) */
     .dots-progress-wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 8px;
-      padding-top: 6px;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 14px;
     }
 
     .dots-grid {
       display: grid;
-      grid-template-columns: repeat(15, 1fr);
-      gap: 9px 8px;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 10px 14px;
       width: 100%;
-      max-width: 440px;
+      max-width: 330px;
       justify-items: center;
       align-items: center;
     }
@@ -487,20 +508,21 @@
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background-color: #DDD4C8;
-      transition: all 0.3s ease;
+      background-color: var(--border-color); /* 淡雅米灰未達成 */
+      transition: all 0.25s ease;
     }
 
     .progress-dot.filled {
-      background-color: #B46B34;
-      box-shadow: 0 1px 3px rgba(180, 107, 52, 0.35);
+      background-color: var(--accent-sage); /* 契合介面之青鼠灰綠 */
+      box-shadow: 0 1px 4px rgba(107, 127, 109, 0.4);
     }
 
     .dots-cycle-tip {
       font-size: 12.5px;
       color: var(--text-light);
-      letter-spacing: 0.8px;
+      letter-spacing: 0.6px;
       margin-top: 2px;
+      text-align: center;
     }
 
     /* History & Idea Vault */
@@ -849,7 +871,7 @@
 
     <!-- TAB 3: History -->
     <div id="view-history" class="tab-content" style="display: none;">
-      <!-- 實修數據看板：三欄指標 & 30天圓點計數進度盤 (v2.9) -->
+      <!-- 實修數據看板：三欄指標（連續天數 · 累積總長 · 累計天數）& 30天圓點計數進度盤 (v2.9) -->
       <div class="stats-dashboard">
         <div class="stats-top-row">
           <div class="stat-col">
@@ -857,8 +879,8 @@
             <div class="stat-main-label">連續天數</div>
           </div>
           <div class="stat-col">
-            <div id="week-minutes-count" class="stat-main-num">0</div>
-            <div class="stat-main-label">近七日分鐘</div>
+            <div id="total-meditation-time" class="stat-main-num">0 分鐘</div>
+            <div class="stat-main-label">累積靜心<br>總長</div>
           </div>
           <div class="stat-col">
             <div id="total-days-count" class="stat-main-num">0</div>
@@ -866,17 +888,10 @@
           </div>
         </div>
 
-        <!-- 30 顆實修圓點進度盤 (2行 x 15顆 = 30天一循環) -->
+        <!-- 30 顆實修圓點進度盤 (3行 x 10顆 = 30天一單位) -->
         <div class="dots-progress-wrapper">
           <div id="dots-grid" class="dots-grid"></div>
           <div id="dots-cycle-tip" class="dots-cycle-tip"></div>
-        </div>
-      </div>
-        <div class="stat-box" style="border-left: 1px dashed var(--border-color); padding-left: 16px;">
-          <div class="stat-label">累積靜心總長</div>
-          <div class="stat-num-row">
-            <span id="total-meditation-time" class="stat-num" style="font-size: 26px;">0 分鐘</span>
-          </div>
         </div>
       </div>
 
@@ -911,8 +926,19 @@
 
     <!-- TAB 4: Ideas Vault -->
     <div id="view-ideas" class="tab-content" style="display: none;">
+      <!-- 靈光庫頂部標題卡片 -->
+      <div class="card" style="margin-bottom: 18px; padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <h2 style="font-family: var(--font-serif); font-size: 22px; font-weight: 600; letter-spacing: 2px; color: var(--text-main); margin: 0;">靈 光 寶 庫</h2>
+          <span id="ideas-count-badge" style="font-size: 13.5px; color: var(--accent-clay); font-weight: 600; font-family: var(--font-serif);">共 0 則</span>
+        </div>
+        <p style="font-size: 13.5px; color: var(--text-muted); margin-top: 6px; margin-bottom: 0; letter-spacing: 0.5px;">沉澱心緒後，浮現的直覺、念頭與生活洞見</p>
+      </div>
+
+      <!-- 靈光紀錄清單 (依時間倒序陳列於下方) -->
       <div id="ideas-list"></div>
     </div>
+  </div>
   </div>
 
   <!-- Quick Idea Modal -->
@@ -1573,28 +1599,28 @@
       return streak;
     }
 
-    // 2. 計算近七日靜心分鐘數（過去7天內，含今天）
-    function calculatePast7DaysMinutes() {
-      if (!appData.records || appData.records.length === 0) return 0;
-      const now = Date.now();
-      const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
-
-      let sumMins = 0;
+    // 2. 關鍵修改：計算坐禪靜心累積總長（動態靜心不計入總長），字體手機自適應防溢
+    function calculateTotalTime() {
+      if (!appData.records || appData.records.length === 0) return "0 分鐘";
+      let totalMins = 0;
       appData.records.forEach(r => {
-        const t = r.timestamp || (r.date ? new Date(r.date).getTime() : 0);
-        if (t >= sevenDaysAgo) {
-          sumMins += (r.staticMins || 0);
-        }
+        totalMins += (r.staticMins || 0);
       });
-      return sumMins;
+
+      if (totalMins < 60) {
+        return `${totalMins} 分鐘`;
+      }
+      const hrs = Math.floor(totalMins / 60);
+      const mins = totalMins % 60;
+      return mins > 0 ? `${hrs}h ${mins}m` : `${hrs} 小時`;
     }
 
-    // 3. 計算累計天數（有靜心的總天數）
+    // 3. 計算累計天數（有靜心的總天數，當天有靜心就累積一天）
     function calculateTotalDays() {
       return getMeditationDateSet().size;
     }
 
-    // 4. 渲染 30 天圓點進度矩陣 (以30天為一計數單位)
+    // 4. 渲染 30 天圓點進度矩陣 (3排 x 10顆 = 30天一循環)
     function renderDotsProgress(totalDays) {
       const dotsGrid = document.getElementById('dots-grid');
       const cycleTip = document.getElementById('dots-cycle-tip');
@@ -1609,7 +1635,7 @@
         filledInCurrentCycle = ((totalDays - 1) % CYCLE_SIZE) + 1;
       }
 
-      // 生成 30 顆圓點 (2行 x 15顆)
+      // 生成 30 顆圓點 (3排 x 10顆)
       let dotsHtml = '';
       for (let i = 1; i <= CYCLE_SIZE; i++) {
         const isFilled = i <= filledInCurrentCycle;
@@ -1629,14 +1655,22 @@
     // --- Render History & Ideas with Edit Functionality ---
     function renderHistory() {
       const streak = calculateStreak();
-      const weekMins = calculatePast7DaysMinutes();
+      const totalTimeStr = calculateTotalTime();
       const totalDays = calculateTotalDays();
 
       const streakEl = document.getElementById("streak-days-count");
       if (streakEl) streakEl.textContent = streak;
 
-      const weekMinsEl = document.getElementById("week-minutes-count");
-      if (weekMinsEl) weekMinsEl.textContent = weekMins;
+      const totalTimeEl = document.getElementById("total-meditation-time");
+      if (totalTimeEl) {
+        totalTimeEl.textContent = totalTimeStr;
+        // 手機自適應文字大小：長文字微調為 20px，避免小螢幕折行
+        if (totalTimeStr.length > 7) {
+          totalTimeEl.style.fontSize = '20px';
+        } else {
+          totalTimeEl.style.fontSize = '23px';
+        }
+      }
 
       const totalDaysEl = document.getElementById("total-days-count");
       if (totalDaysEl) totalDaysEl.textContent = totalDays;
@@ -1650,6 +1684,7 @@
         return;
       }
 
+      // 嚴格保留 v2.8 每次靜心的完整呈現方式
       container.innerHTML = appData.records.map(r => `
         <div class="entry-card">
           <div class="entry-header-row">
@@ -1692,7 +1727,11 @@
 
     function renderIdeas() {
       const container = document.getElementById('ideas-list');
-      if (appData.ideas.length === 0) {
+      const badge = document.getElementById('ideas-count-badge');
+      if (badge) badge.textContent = `共 ${appData.ideas ? appData.ideas.length : 0} 則`;
+
+      if (!container) return;
+      if (!appData.ideas || appData.ideas.length === 0) {
         container.innerHTML = '<div class="empty-tip card">靈感池空明澄澈。靜心時若有靈光浮現，可隨時記錄於此。</div>';
         return;
       }
@@ -1709,10 +1748,12 @@
                 </svg>
                 修改
               </button>
-              <button class="action-icon-btn delete-hover" onclick="deleteIdea(${item.id})" title="移除靈光">✕</button>
+              <button class="action-icon-btn delete-hover" onclick="deleteIdea(${item.id})" title="刪除靈光">✕</button>
             </div>
           </div>
-          <div style="font-size:17px; line-height:1.6; color:var(--text-main);">${item.text}</div>
+          <div style="font-size: 15.5px; line-height: 1.65; color: var(--text-main); margin-top: 6px;">
+            ${escapeHtml(item.text)}
+          </div>
         </div>
       `).join('');
     }
