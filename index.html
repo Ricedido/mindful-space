@@ -421,48 +421,86 @@
       border-color: var(--accent-sage);
     }
 
-    /* Stats Dashboard: 累積靜心總長 & 連續靜心 */
+    /* Stats Dashboard v2.9 (三欄數值 + 30天圓點矩陣) */
     .stats-dashboard {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
-      padding: 22px 20px;
-      margin-bottom: 18px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      padding: 24px 20px 20px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
       box-shadow: var(--shadow-soft);
       backdrop-filter: blur(12px);
     }
 
-    .stat-box {
+    .stats-top-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      text-align: center;
+      align-items: flex-end;
+    }
+
+    .stat-col {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-    }
-
-    .stat-label {
-      font-size: 14.5px;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-    }
-
-    .stat-num-row {
-      display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 4px;
     }
 
-    .stat-num {
-      font-size: 34px;
+    .stat-main-num {
+      font-size: 42px;
       font-family: var(--font-serif);
-      color: var(--accent-sage);
-      font-weight: 600;
+      color: #A86536;
+      line-height: 1.1;
+      font-weight: 400;
     }
 
-    .stat-unit {
-      font-size: 15px;
-      color: var(--text-muted);
+    .stat-main-label {
+      font-family: var(--font-serif);
+      font-size: 15.5px;
+      color: #6E685F;
+      letter-spacing: 1.5px;
+    }
+
+    /* 30 顆圓點容器 (2行 x 15顆) */
+    .dots-progress-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding-top: 6px;
+    }
+
+    .dots-grid {
+      display: grid;
+      grid-template-columns: repeat(15, 1fr);
+      gap: 9px 8px;
+      width: 100%;
+      max-width: 440px;
+      justify-items: center;
+      align-items: center;
+    }
+
+    .progress-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background-color: #DDD4C8;
+      transition: all 0.3s ease;
+    }
+
+    .progress-dot.filled {
+      background-color: #B46B34;
+      box-shadow: 0 1px 3px rgba(180, 107, 52, 0.35);
+    }
+
+    .dots-cycle-tip {
+      font-size: 12.5px;
+      color: var(--text-light);
+      letter-spacing: 0.8px;
+      margin-top: 2px;
     }
 
     /* History & Idea Vault */
@@ -627,7 +665,7 @@
     <!-- Header -->
     <header class="app-header">
       <div class="app-title">
-        <h1>靜 心 空 間 <span class="app-version-tag">v2.8</span></h1>
+        <h1>靜 心 空 間 <span class="app-version-tag">v2.9</span></h1>
         <p>留一段澄澈與自己同在</p>
       </div>
       <div class="header-actions">
@@ -811,15 +849,29 @@
 
     <!-- TAB 3: History -->
     <div id="view-history" class="tab-content" style="display: none;">
-      <!-- 實修雙數據看板：連續靜心 & 累積靜心總長（動態靜心不計入總長） -->
+      <!-- 實修數據看板：三欄指標 & 30天圓點計數進度盤 (v2.9) -->
       <div class="stats-dashboard">
-        <div class="stat-box">
-          <div class="stat-label">連續靜心</div>
-          <div class="stat-num-row">
-            <span id="streak-days-count" class="stat-num">0</span>
-            <span class="stat-unit">天</span>
+        <div class="stats-top-row">
+          <div class="stat-col">
+            <div id="streak-days-count" class="stat-main-num">0</div>
+            <div class="stat-main-label">連續天數</div>
+          </div>
+          <div class="stat-col">
+            <div id="week-minutes-count" class="stat-main-num">0</div>
+            <div class="stat-main-label">近七日分鐘</div>
+          </div>
+          <div class="stat-col">
+            <div id="total-days-count" class="stat-main-num">0</div>
+            <div class="stat-main-label">累計天數</div>
           </div>
         </div>
+
+        <!-- 30 顆實修圓點進度盤 (2行 x 15顆 = 30天一循環) -->
+        <div class="dots-progress-wrapper">
+          <div id="dots-grid" class="dots-grid"></div>
+          <div id="dots-cycle-tip" class="dots-cycle-tip"></div>
+        </div>
+      </div>
         <div class="stat-box" style="border-left: 1px dashed var(--border-color); padding-left: 16px;">
           <div class="stat-label">累積靜心總長</div>
           <div class="stat-num-row">
@@ -1472,10 +1524,11 @@
     });
 
     // --- Streak & Total Time Calculation (動態靜心不計入累積靜心時間) ---
-    function calculateStreak() {
-      if (!appData.records || appData.records.length === 0) return 0;
-      
+    // 取得所有有靜心記錄的不重複日期集合 (YYYY-MM-DD)
+    function getMeditationDateSet() {
       const dateSet = new Set();
+      if (!appData.records || appData.records.length === 0) return dateSet;
+
       appData.records.forEach(r => {
         if (r.timestamp) {
           const d = new Date(r.timestamp);
@@ -1485,6 +1538,13 @@
           dateSet.add(r.date.split(' ')[0]);
         }
       });
+      return dateSet;
+    }
+
+    // 1. 計算連續靜心天數
+    function calculateStreak() {
+      const dateSet = getMeditationDateSet();
+      if (dateSet.size === 0) return 0;
 
       const today = new Date();
       let streak = 0;
@@ -1513,31 +1573,78 @@
       return streak;
     }
 
-    // 關鍵修改：僅計算坐禪/靜心時長，動態靜心不計入總長
-    function calculateTotalTime() {
-      if (!appData.records || appData.records.length === 0) return "0 分鐘";
-      let totalMins = 0;
-      appData.records.forEach(r => {
-        totalMins += (r.staticMins || 0);
-      });
+    // 2. 計算近七日靜心分鐘數（過去7天內，含今天）
+    function calculatePast7DaysMinutes() {
+      if (!appData.records || appData.records.length === 0) return 0;
+      const now = Date.now();
+      const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
 
-      if (totalMins < 60) {
-        return `${totalMins} 分鐘`;
+      let sumMins = 0;
+      appData.records.forEach(r => {
+        const t = r.timestamp || (r.date ? new Date(r.date).getTime() : 0);
+        if (t >= sevenDaysAgo) {
+          sumMins += (r.staticMins || 0);
+        }
+      });
+      return sumMins;
+    }
+
+    // 3. 計算累計天數（有靜心的總天數）
+    function calculateTotalDays() {
+      return getMeditationDateSet().size;
+    }
+
+    // 4. 渲染 30 天圓點進度矩陣 (以30天為一計數單位)
+    function renderDotsProgress(totalDays) {
+      const dotsGrid = document.getElementById('dots-grid');
+      const cycleTip = document.getElementById('dots-cycle-tip');
+      if (!dotsGrid) return;
+
+      const CYCLE_SIZE = 30;
+      let filledInCurrentCycle = 0;
+      let currentCycle = 1;
+
+      if (totalDays > 0) {
+        currentCycle = Math.floor((totalDays - 1) / CYCLE_SIZE) + 1;
+        filledInCurrentCycle = ((totalDays - 1) % CYCLE_SIZE) + 1;
       }
-      const hrs = Math.floor(totalMins / 60);
-      const mins = totalMins % 60;
-      return mins > 0 ? `${hrs} 小時 ${mins} 分` : `${hrs} 小時`;
+
+      // 生成 30 顆圓點 (2行 x 15顆)
+      let dotsHtml = '';
+      for (let i = 1; i <= CYCLE_SIZE; i++) {
+        const isFilled = i <= filledInCurrentCycle;
+        dotsHtml += `<div class="progress-dot ${isFilled ? 'filled' : ''}" title="第 ${i} 天"></div>`;
+      }
+      dotsGrid.innerHTML = dotsHtml;
+
+      if (cycleTip) {
+        if (totalDays === 0) {
+          cycleTip.textContent = '完成當日靜心，即可點亮實修圓點';
+        } else {
+          cycleTip.textContent = `第 ${currentCycle} 輪實修進度 · 已點亮 ${filledInCurrentCycle} / 30 天（總累計 ${totalDays} 天）`;
+        }
+      }
     }
 
     // --- Render History & Ideas with Edit Functionality ---
     function renderHistory() {
-      const streakEl = document.getElementById("streak-days-count");
-      if (streakEl) streakEl.textContent = calculateStreak();
+      const streak = calculateStreak();
+      const weekMins = calculatePast7DaysMinutes();
+      const totalDays = calculateTotalDays();
 
-      const totalTimeEl = document.getElementById("total-meditation-time");
-      if (totalTimeEl) totalTimeEl.textContent = calculateTotalTime();
+      const streakEl = document.getElementById("streak-days-count");
+      if (streakEl) streakEl.textContent = streak;
+
+      const weekMinsEl = document.getElementById("week-minutes-count");
+      if (weekMinsEl) weekMinsEl.textContent = weekMins;
+
+      const totalDaysEl = document.getElementById("total-days-count");
+      if (totalDaysEl) totalDaysEl.textContent = totalDays;
+
+      renderDotsProgress(totalDays);
 
       const container = document.getElementById('history-list');
+      if (!container) return;
       if (appData.records.length === 0) {
         container.innerHTML = '<div class="empty-tip card">尚無靜心紀錄。在靜寂中留下第一筆足跡吧。</div>';
         return;
@@ -1550,7 +1657,7 @@
             <div class="card-actions">
               <button class="action-icon-btn" onclick="openEditRecordModal(${r.id})" title="修改紀錄">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M11 4H4a2 2 0 0 1-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                 </svg>
                 修改
@@ -1560,17 +1667,17 @@
           </div>
           <div class="entry-duration">
             靜心 ${r.staticMins} 分鐘
-            ${r.hasDynamic ? `<span style="font-size:15px; color:var(--text-muted); font-weight:normal; margin-left:6px;">(動態鬆身 ${r.dynamicMins} 分鐘)</span>` : ''}
+            ${r.hasDynamic ? `<span style="font-size:15px; color:var(--text-muted); font-weight:normal;">（動態 ${r.dynamicMins} 分鐘）</span>` : ''}
           </div>
-          ${r.mindStatus && r.mindStatus.length ? `
+          ${r.mindStatus ? `
             <div class="entry-tags">
-              ${r.mindStatus.map(t => `<span class="entry-tag" style="background:var(--accent-sage-soft); color:var(--accent-sage); font-weight:500;">${t}</span>`).join('')}
+              ${r.mindStatus.split(',').map(t => `<span class="entry-tag">心：${t.trim()}</span>`).join('')}
             </div>` : ''}
-          ${r.bodyStatus && r.bodyStatus.length ? `
+          ${r.bodyStatus ? `
             <div class="entry-tags">
-              ${r.bodyStatus.map(t => `<span class="entry-tag">${t}</span>`).join('')}
+              ${r.bodyStatus.split(',').map(t => `<span class="entry-tag">身：${t.trim()}</span>`).join('')}
             </div>` : ''}
-          ${r.idea ? `<div class="entry-idea"><strong>靈光：</strong>${r.idea}</div>` : ''}
+          ${r.idea ? `<div class="entry-idea">💡 <strong>靈光：</strong>${escapeHtml(r.idea)}</div>` : ''}
         </div>
       `).join('');
     }
